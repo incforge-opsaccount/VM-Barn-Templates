@@ -1,0 +1,118 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_BARNFSSQL_200807_113418_name": {
+            "defaultValue": "BARNFSSQL-200807-113418",
+            "type": "String"
+        },
+        "disks_BARNFSSQL_200807_113418_winpe_vhd_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Compute/disks/BARNFSSQL-200807-113418-winpe.vhd",
+            "type": "String"
+        },
+        "disks_BARNFSSQL_200807_113418_VHD0_vhd_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Compute/disks/BARNFSSQL-200807-113418-VHD0.vhd",
+            "type": "String"
+        },
+        "disks_BARNFSSQL_SQL_DATA_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Compute/disks/BARNFSSQL-SQL-DATA",
+            "type": "String"
+        },
+        "disks_BARNABI_SQL_DATA_DISK_1_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Compute/disks/BARNABI-SQL-DATA-DISK-1",
+            "type": "String"
+        },
+        "networkInterfaces_nic326220c179d_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Network/networkInterfaces/nic326220c179d",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-11-01",
+            "name": "[parameters('virtualMachines_BARNFSSQL_200807_113418_name')]",
+            "location": "ukwest",
+            "tags": {
+                "type": "customer",
+                "group": "wft",
+                "client": "WfT",
+                "environment": "WFT-Barnardos",
+                "service": "faststats",
+                "ID": "BARNFSSQL"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_E8s_v3"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachines_BARNFSSQL_200807_113418_name'), '-winpe.vhd')]",
+                        "createOption": "Attach",
+                        "caching": "ReadWrite",
+                        "writeAcceleratorEnabled": false,
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS",
+                            "id": "[parameters('disks_BARNFSSQL_200807_113418_winpe_vhd_externalid')]"
+                        }
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "[concat(parameters('virtualMachines_BARNFSSQL_200807_113418_name'), '-VHD0.vhd')]",
+                            "createOption": "Attach",
+                            "caching": "ReadWrite",
+                            "writeAcceleratorEnabled": false,
+                            "managedDisk": {
+                                "storageAccountType": "Standard_LRS",
+                                "id": "[parameters('disks_BARNFSSQL_200807_113418_VHD0_vhd_externalid')]"
+                            },
+                            "toBeDetached": false
+                        },
+                        {
+                            "lun": 1,
+                            "name": "BARNFSSQL-SQL-DATA",
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "writeAcceleratorEnabled": false,
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS",
+                                "id": "[parameters('disks_BARNFSSQL_SQL_DATA_externalid')]"
+                            },
+                            "toBeDetached": false
+                        },
+                        {
+                            "lun": 2,
+                            "name": "BARNABI-SQL-DATA-DISK-1",
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "writeAcceleratorEnabled": false,
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS",
+                                "id": "[parameters('disks_BARNABI_SQL_DATA_DISK_1_externalid')]"
+                            },
+                            "toBeDetached": false
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_nic326220c179d_externalid')]",
+                            "properties": {
+                                "primary": true
+                            }
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            }
+        }
+    ]
+}

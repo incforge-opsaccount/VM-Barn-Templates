@@ -1,0 +1,82 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_BARNFSBLENDER_200810_171641_name": {
+            "defaultValue": "BARNFSBLENDER-200810-171641",
+            "type": "String"
+        },
+        "disks_BARNFSBLENDER_200810_171641_winpe_vhd_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Compute/disks/BARNFSBLENDER-200810-171641-winpe.vhd",
+            "type": "String"
+        },
+        "disks_BARNFSBLENDER_200810_171641_VHD0_vhd_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Compute/disks/BARNFSBLENDER-200810-171641-VHD0.vhd",
+            "type": "String"
+        },
+        "networkInterfaces_nic0018705f7c9_externalid": {
+            "defaultValue": "/subscriptions/50704de3-53da-416c-8404-55338c4505cf/resourceGroups/barnardos/providers/Microsoft.Network/networkInterfaces/nic0018705f7c9",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-11-01",
+            "name": "[parameters('virtualMachines_BARNFSBLENDER_200810_171641_name')]",
+            "location": "ukwest",
+            "tags": {
+                "client": "WfT",
+                "environment": "WFT-Barnardos",
+                "service": "faststats",
+                "ID": "BARNFSBLENDER"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D4s_v3"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachines_BARNFSBLENDER_200810_171641_name'), '-winpe.vhd')]",
+                        "createOption": "Attach",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS",
+                            "id": "[parameters('disks_BARNFSBLENDER_200810_171641_winpe_vhd_externalid')]"
+                        }
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "[concat(parameters('virtualMachines_BARNFSBLENDER_200810_171641_name'), '-VHD0.vhd')]",
+                            "createOption": "Attach",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "Standard_LRS",
+                                "id": "[parameters('disks_BARNFSBLENDER_200810_171641_VHD0_vhd_externalid')]"
+                            },
+                            "toBeDetached": false
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_nic0018705f7c9_externalid')]",
+                            "properties": {
+                                "primary": true
+                            }
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            }
+        }
+    ]
+}
